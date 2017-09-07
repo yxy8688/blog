@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 映射文件的命名空间namespace的值是与之对应的映射接口的全类名 -->
+<mapper namespace="com.yc.ssm.us.mapper.B_articleMapper">
+
+	<!--查询所有的文章 -->
+	<select id="findArticle" resultType="B_article">
+		select ba.*,
+		bu.uname,bt.tagname,bty.tname from b_article ba
+		left join b_user bu on
+		ba.usid = bu.usid
+		left join b_tag bt on ba.tagid=bt.tagid
+		left join
+		b_type bty on ba.tid =bty.tid
+	</select>
+		
+	<!-- 分页显示所有的文章（按时间） -->
+	<select id="findArticleByTime" resultType="B_article" parameterType="B_article">
+		select * from (
+		select t.*, rownum rn  from (select bar.*,bu.uname,bt.tagname,bty.tname,nvl(w.commentnum,0) as commentnum from b_article bar
+		inner join b_user bu on bar.usid = bu.usid
+		left join b_tag bt on bar.tagid=bt.tagid
+		left join b_type bty on bar.tid =bty.tid
+		left join (select d.caid,count(1) as commentnum from (
+			select caid from B_COMMENT b right join B_ARTICLE ba on ba.aid = b.caid) d group by d.caid) w
+			on w.caid = bar.aid order by bar.atime desc) t 
+		where ${currPage}*${pageSize}>=rownum)  
+		where rn>(${currPage}-1)*${pageSize}
+	</select>
+	
+	<!-- 首页按浏览量数显示热度文章 -->
+	<select id="findArticleByHot" resultType="B_article" parameterType="B_article">
+		select * from (
+		select t.*, rownum rn  from (select bar.*,bu.uname,bt.tagname,bty.tname,nvl(w.commentnum,0) as commentnum from b_article bar
+		inner join b_user bu on bar.usid = bu.usid
+		left join b_tag bt on bar.tagid=bt.tagid
+		left join b_type bty on bar.tid =bty.tid
+		left join (select d.caid,count(1) as commentnum from (
+			select caid from B_COMMENT b right join B_ARTICLE ba on ba.aid = b.caid) d group by d.caid) w
+			on w.caid = bar.aid order by bar.aviewnum desc) t 
+		where ${currPage}*${pageSize}>=rownum)  
+		where rn>(${currPage}-1)*${pageSize}
+	</select>
+
+	<!-- 通过用户id查询个人文章 -->
+	<select id="findPersonArticle" parameterType="Integer"
+		resultType="B_article">
+		select bt.*, bu.uname from b_article bt left join b_user bu
+		on bt.usid = bu.usid where bu.usid = #{usid}
+	</select>
+
+<!-- 分页查询指定usid 的 文章  默认按时间排序 （条件为类型 type）-->
+	<select id="findArticleByType" parameterType="B_article" resultType="B_article">
+		select * from (
+		select t.*, rownum rn  from (select bar.*,bu.uname,bt.tagname,bty.tname,nvl(w.commentnum,0) as commentnum from b_article bar
+		inner join b_user bu on bar.usid = bu.usid
+		left join b_tag bt on bar.tagid=bt.tagid
+		left join b_type bty on bar.tid =bty.tid
+		left join (select d.caid,count(1) as commentnum from (
+			select caid from B_COMMENT b right join B_ARTICLE ba on ba.aid = b.caid) d group by d.caid) w
+			on w.caid = bar.aid order by bar.atime desc) t 
+		where ${currPage}*${pageSize}>=rownum 
+		and t.tid = #{tid} and t.usid = #{usid})  
+		where rn>(${currPage}-1)*${pageSize}
+	</select>
+	
+	<!-- 分页查询指定usid 的 文章  默认按时间排序 （条件为类别 tag）-->
+	<select id="findArticleByTag" parameterType="B_article" resultType="B_article">
+		select * from (
+		select t.*, rownum rn  from (select bar.*,bu.uname,bt.tagname,bty.tname,nvl(w.commentnum,0) as commentnum from b_article bar
+		inner join b_user bu on bar.usid = bu.usid
+		left join b_tag bt on bar.tagid=bt.tagid
+		left join b_type bty on bar.tid =bty.tid
+		left join (select d.caid,count(1) as commentnum from (
+			select caid from B_COMMENT b right join B_ARTICLE ba on ba.aid = b.caid) d group by d.caid) w
+			on w.caid = bar.aid order by bar.atime desc) t 
+		where ${currPage}*${pageSize}>=rownum 
+		and t.tagid = #{tagid} and t.usid = #{usid})  
+		where rn>(${currPage}-1)*${pageSize}
+	</select>
+
+	<!-- 通过用户名查找 -->
+	<select id="listArticleByuname" parameterType="String"
+		resultType="B_article">
+		select ba.*,
+		bu.uname,bt.tagname,bty.tname,nvl(w.commentnum,0) as commentnum from b_article ba
+		inner join
+		b_user bu on ba.usid = bu.usid
+		left join b_tag bt on ba.tagid=bt.tagid
+		left join b_type bty on ba.tid =bty.tid
+		left join (select d.caid,count(1) as commentnum from (
+			select caid from B_COMMENT b right join B_ARTICLE ba on ba.aid = b.caid) d group by d.caid) w
+			on w.caid = ba.aid   
+		<choose>
+			<when test="_parameter!= null ">
+				where bu.uname like '%${_parameter}%'
+				or bu.uname like
+				'%${_parameter}'
+				or bu.uname like
+				'${_parameter}%'
+			</when>
+		</choose>
+	</select>
+	<!-- 通过类型名查找 -->
+	<select id="listArticleBytname" parameterType="String"
+		resultType="B_article">
+		select ba.*,
+		bu.uname,bt.tagname,bty.tname ,nvl(w.commentnum,0) as commentnum from b_article ba
+		inner join
+		b_user bu on ba.usid = bu.usid
+		left join b_tag bt on
+		ba.tagid=bt.tagid
+		left join b_type bty on ba.tid =bty.tid
+		left join (select d.caid,count(1) as commentnum from (
+			select caid from B_COMMENT b right join B_ARTICLE ba on ba.aid = b.caid) d group by d.caid) w
+			on w.caid = ba.aid   
+		<choose>
+			<when test="_parameter!= null ">
+				where bty.tname like '%${_parameter}%'
+				or bty.tname like '%${_parameter}'
+				or bty.tname like '${_parameter}%'
+			</when>
+		</choose>
+	</select>
+	<!--通过标签名查询 -->
+	<select id="listArticleBytagname" parameterType="B_article"
+		resultType="B_article">
+		select ba.*,
+		bu.uname,bt.tagname,bty.tname,nvl(w.commentnum,0) as commentnum from b_article ba
+		inner join
+		b_user bu on ba.usid = bu.usid
+		left join b_tag bt on ba.tagid=bt.tagid
+		left join b_type bty on ba.tid =bty.tid
+		left join (select d.caid,count(1) as commentnum from (
+			select caid from B_COMMENT b right join B_ARTICLE ba on ba.aid = b.caid) d group by d.caid ) w
+			on w.caid = ba.aid 
+		<choose>
+			<when test="_parameter!= null ">
+				where lower(bt.tagname) like '%${tagname}%'
+				or bt.tagname
+				like
+				'%${tagname}'
+				or bt.tagname like
+				'${tagname}%'
+			</when>
+		</choose>
+		order by ba.aviewnum desc
+	</select>
+
+	<!--通过板块文章id对应的文章信息 -->
+	<select id="listArticleByCoaid" parameterType="String"
+		resultType="B_article">
+		<!-- select ba.*,bu.uname,bt.tagname,bty.tname
+		from b_article ba,b_user bu,b_tag bt,b_type bty
+		where ba.usid = bu.usid(+) and ba.tagid=bt.tagid(+) and ba.tid =bty.tid(+)
+		and ba.aid in
+		<foreach collection="list" item="listcoaid" index="index"
+			open="(" close=")" separator=",">
+			#{listcoaid}
+		</foreach> -->
+		select * from (
+			select bar.*,bu.uname,bt.tagname,bty.tname,nvl(w.commentnum,0) as commentnum from b_article bar
+			inner join b_user bu on bar.usid = bu.usid
+			left join b_tag bt on bar.tagid=bt.tagid
+			left join b_type bty on bar.tid =bty.tid
+			left join (select d.caid,count(1) as commentnum from (
+				select caid from B_COMMENT b right join B_ARTICLE ba on ba.aid = b.caid) d group by d.caid) w
+				on w.caid = bar.aid order by bar.atime desc ) t
+		where t.aid in 
+			<foreach collection="list" item="listcoaid" index="index"
+			open="(" close=")" separator=",">
+			#{listcoaid}
+			</foreach>
+	</select>
+
+	<!-- // 查询博客文章(通过文章id) -->
+	<select id="findArticleByAid" parameterType="Integer"
+		resultType="B_article">
+		select
+		ba.*,bt.tagname,bty.tname,bu.uname,bu.upic,bu.upersondesc from
+		b_article ba
+		left join b_user bu on ba.usid = bu.usid
+		left join b_tag bt
+		on ba.tagid=bt.tagid
+		left join b_type bty on ba.tid =bty.tid
+		where
+		ba.aid = #{aid}
+	</select>
+
+	<!-- 分页查询文章 -->
+	<resultMap type="PaginationBean" id="PaginationBeanMap">
+		<collection property="rows"
+			column="{pageSize=pageSize,currPage=currPage}" ofType="B_article"
+			select="getPartArticle" />
+	</resultMap>
+	<select id="partArticle" parameterType="PaginationBean"
+		resultMap="PaginationBeanMap">
+		select count(1) total ,ceil(count(1)/${pageSize})
+		totalPage ,
+		${currPage} currPage,${pageSize} pageSize from b_article
+	</select>
+
+	<select id="getPartArticle" resultType="B_article">
+		select * from (
+		select n.*,rownum rn from (
+		select ba.*,bu.uname,bt.tagname,bty.tname,nvl(bc.commentnum,0) commentnum from
+			b_article ba, b_user bu ,b_tag bt,b_type bty,(select caid,count(usid) commentnum from b_comment group by usid ,caid) bc 
+			where ba.usid = bu.usid(+) and ba.tagid=bt.tagid(+) and ba.aid=bc.caid(+)
+				and ba.tid =bty.tid(+) order by 1)n 
+			where ${currPage}*${pageSize}>=rownum) t
+			where rn>(${currPage}-1)*${pageSize}
+	</select>
+	<!-- 分页查询指定usid 的 文章  默认按时间排序-->
+	<select id="partArticleById" parameterType="B_article" resultType="B_article">
+		select * from (
+		select t.*, rownum rn  from (select bar.*,bu.uname,bt.tagname,bty.tname,nvl(w.commentnum,0) as commentnum from b_article bar
+		inner join b_user bu on bar.usid = bu.usid
+		left join b_tag bt on bar.tagid=bt.tagid
+		left join b_type bty on bar.tid =bty.tid
+		left join (select d.caid,count(1) as commentnum from (
+			select caid from B_COMMENT b right join B_ARTICLE ba on ba.aid = b.caid) d group by d.caid) w
+			on w.caid = bar.aid order by bar.atime desc) t 
+		where ${currPage}*${pageSize}>=rownum and t.usid = #{usid})  
+		where rn>(${currPage}-1)*${pageSize}
+	</select>
+	
+	<!-- 分页查询指定usid 的 文章  默认按时间排序 （条件为 atitle）-->
+	<select id="findArticleByAtitle" parameterType="B_article" resultType="B_article">
+		select * from (
+		select t.*, rownum rn  from (select bar.*,bu.uname,bt.tagname,bty.tname,nvl(w.commentnum,0) as commentnum from b_article bar
+		inner join b_user bu on bar.usid = bu.usid
+		left join b_tag bt on bar.tagid=bt.tagid
+		left join b_type bty on bar.tid =bty.tid
+		left join (select d.caid,count(1) as commentnum from (
+			select caid from B_COMMENT b right join B_ARTICLE ba on ba.aid = b.caid) d group by d.caid) w
+			on w.caid = bar.aid order by bar.atime desc) t 
+		where ${currPage}*${pageSize}>=rownum 
+		and t.atitle like '%' || #{atitle}|| '%' and t.usid = #{usid})  
+		where rn>(${currPage}-1)*${pageSize}
+	</select>
+	
+	<!-- 查询用户id所作的文章数及总页数 -->
+	<select id="findArticleNum" parameterType="B_article" resultType="B_article">
+		select count(1) total ,ceil(count(1)/${pageSize}) totalPage from b_article b where usid = #{usid}
+	</select>
+	
+	<!-- 查询用户id所作的文章数及总页数   by  type 类型表-->
+	<select id="findArticleNumByType" parameterType="B_article" resultType="B_article">
+		select count(1) total ,ceil(count(1)/${pageSize}) totalPage from b_article b where usid = #{usid} and tid = #{tid}
+	</select>
+	
+	
+	<!-- 查询用户id所作的文章数及总页数   by  tag  类别表-->
+	<select id="findArticleNumByTag" parameterType="B_article" resultType="B_article">
+		select count(1) total ,ceil(count(1)/${pageSize}) totalPage from b_article b where usid = #{usid} and tagid = #{tagid}
+	</select>
+	<!-- 查询用户id所作的文章数及总页数   by  atitle 标题查询-->
+	<select id="findArticleNumByAtitle" parameterType="B_article" resultType="B_article">
+		select count(1) total ,ceil(count(1)/${pageSize}) totalPage from b_article b where usid = #{usid} and atitle like #{atitle}
+	</select>
+
+
+	<!-- 查询文章的所有总数和总页数 -->
+	<select id="findArticleTotal" resultType="B_article">
+		select count(1) total
+		,ceil(count(1)/10) totalPage from b_article
+	</select>
+
+	<!-- 查询所有用户所作的文章数的排行（前十） -->
+	<select id="articleAnalytics" resultType="B_article">
+		select
+		n.*,rownum from
+		(select bu.usid usid,
+		bu.uname uname,COUNT(ba.aid) articleNum from
+		b_article ba,b_user bu where
+		ba.usid(+)=bu.usid GROUP BY
+		bu.uname,bu.usid ORDER BY articleNum DESC
+		) n where 10>=rownum
+	</select>
+
+	<!-- 修改博客文章 -->
+	<update id="modifyArticle" parameterType="B_article">
+		update B_article
+		<set>
+			<if test="atitle!=null"> atitle=#{atitle}, </if>
+			<if test="tagid!=null"> tagid=#{tagid}, </if>
+			<if test="tid!=null"> tid=#{tid},	</if>
+			<if test="acontent!=null"> acontent=#{acontent}, </if>
+			<if test="apic!=null"> apic=#{apic}, </if>
+			<if test="aviewnum!=null">aviewnum=#{aviewnum},</if>
+			atime = to_char(sysdate,'yyyy-MM-dd hh24:mi:ss')
+		</set>
+		where aid=#{aid}
+	</update>
+	<!-- 新建博客文章 -->
+	<insert id="insertArticle" parameterType="B_article">
+		insert into b_article
+		(aid,atitle,tid,tagid,usid,atime,acontent,apic)
+		values(seq_aid.nextval,#{atitle},#{tid},#{tagid},#{usid},to_char(sysdate,'yyyy-MM-dd hh24:mi:ss'),#{acontent},#{apic})
+	</insert>
+	<!-- 删除博客 -->
+	<delete id="deleteArticle">
+		delete from B_article where aid=#{aid}
+	</delete>
+	<!-- 更改指定博客的浏览量 -->
+	<update id="updateAviewNum" parameterType="Integer">
+		update B_ARTICLE set
+		aviewnum = (aviewnum+1) where aid = #{aid}
+	</update>
+</mapper>

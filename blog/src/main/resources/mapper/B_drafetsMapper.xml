@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 映射文件的命名空间namespace的值是与之对应的映射接口的全类名 -->
+<mapper namespace="com.yc.ssm.us.mapper.B_drafetsMapper">
+	
+	<!-- 添加草稿 -->
+	<insert id="addDrafet" parameterType="B_article">
+		insert into b_drafets values(seq_drid.nextval,#{usid},#{atitle},#{tid},#{tagid},to_char(sysdate,'yyyy-MM-dd
+		hh24:mi:ss'),#{acontent},#{apic})
+	</insert>	
+	
+	<!-- 根据用户id查询 -->
+	<select id="findDrafetByUsid" parameterType="Integer" resultType="B_drafets">
+		select * from b_drafets where usid = #{usid}
+	</select>
+	
+	<!-- 根据草稿drid查询-->
+	<select id="findDrafetByDrid" parameterType="Integer" resultType="B_drafets">
+		select * from b_drafets where drid = #{drid}
+	</select>
+	
+	<!-- 删除草稿 -->
+	<delete id="deleteDrafet" parameterType="Integer">
+		delete from b_drafets where drid = #{drid}
+	</delete>
+	
+	<!-- 立即发表 -->
+	<insert id="publishArticle" parameterType="B_drafets">
+		insert into b_article
+		(aid,atitle,tid,tagid,usid,atime,acontent,apic)
+		values(seq_aid.nextval,#{drtitle},#{drtypeid},#{drtagid},#{usid},to_char(sysdate,'yyyy-MM-dd
+		hh24:mi:ss'),#{drcontent},#{drpic})
+	</insert>
+	<!-- 修改草稿 -->
+	<update id="updateDrafets" parameterType="B_drafets">
+		update b_drafets 
+			<set>
+			<if test="drtitle!=null">drtitle=#{drtitle}, </if>
+			<if test="drtypeid!=null"> drtypeid=#{drtypeid}, </if>
+			<if test="drtagid!=null"> drtagid=#{drtagid},	</if>
+			<if test="drcontent!=null"> drcontent=#{drcontent}, </if>
+			<if test="drpic!=null"> drpic=#{drpic}, </if>
+			drtime = to_char(sysdate,'yyyy-MM-dd hh24:mi:ss')
+		</set>
+		where drid=#{drid}
+	</update>
+</mapper>

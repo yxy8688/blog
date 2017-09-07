@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 映射文件的命名空间namespace的值是与之对应的映射接口的全类名 -->
+<mapper namespace="com.yc.ssm.us.mapper.B_userMapper">
+	<!--  用户登录-->
+	<select id="userLogin" parameterType="B_user" resultType="B_user">
+		select *
+		from b_user where upassword=#{upassword} and (uemail=#{uemail} or uname=#{uemail})
+	</select>
+	
+	<!-- 博客专家 -->
+	<select id="findProfessor" resultType="B_user">
+		select * from b_user bu inner join
+		(select usid,count(1) articlenum ,sum(aviewnum) aviewtotal from b_article group by usid) t on t.usid = bu.usid
+		where t.articlenum>10 and t.aviewtotal>20
+	</select>
+	
+	<!-- 通过id查询用户 -->
+	<select id="findUserByUsid" parameterType="Integer" resultType="B_user">
+		select * from b_user where usid=#{usid}
+	</select>
+	
+	<!-- 通过用户名查询用户 -->
+	<select id="findUserByuname" parameterType="String" resultType="B_user">
+		select bu.* from b_user bu
+		<choose>
+			<when test="_parameter!= null ">
+				where bu.uname like '%${_parameter}%'
+				or bu.uname like
+				'%${_parameter}'
+				or bu.uname like
+				'${_parameter}%'
+			</when>
+		</choose>
+	</select>
+	
+	<!-- 通过邮件查询用户 -->
+	<select id="findUserByuemail" parameterType="String" resultType="B_user">
+		select bu.* from b_user bu
+		<choose>
+			<when test="_parameter!= null ">
+				where bu.uemail like '%${_parameter}%'
+				or bu.uemail like
+				'%${_parameter}'
+				or bu.uemail like
+				'${_parameter}%'
+			</when>
+		</choose>
+	</select>
+	
+	<!-- 查询所有的用户 -->
+	<select id="findUserAll" resultType="B_user">
+		select * from b_user
+	</select>
+	<!--验证登录是否存在  -->
+	<select id="findUser" parameterType="Integer" resultType="boolean">
+		select * from b_user where usid = #{usid}
+	</select>
+	<resultMap type="PaginationBean" id="PaginationBeanMap">
+		<collection property="rows"
+			column="{pageSize=pageSize,currPage=currPage}" ofType="B_user"
+			select="getPartUser" />
+	</resultMap>
+	<select id="partUser" parameterType="PaginationBean" resultMap="PaginationBeanMap">
+		select count(1) total ,ceil(count(1)/${pageSize}) totalPage ,
+		${currPage}currPage,${pageSize} pageSize from b_user
+	</select>
+
+	<select id="getPartUser" resultType="B_user">
+		select * from (select
+		n.*,rownum rn from
+		(select * from b_user order by 1)n where
+		${currPage}*${pageSize}>=rownum) t
+		where
+		rn>(${currPage}-1)*${pageSize}
+	</select>
+	<!-- 更改用户信息 -->
+	<update id="updateUser" parameterType="B_user">
+		update b_user
+		<set>
+			<if test="uemail!=null">
+				uemail=#{uemail},
+			</if>
+			<if test="upassword!=null">
+				upassword=#{upassword},
+			</if>
+			<if test="uname!=null">
+				uname=#{uname},
+			</if>
+			<if test="usex!=null">
+				usex=#{usex},
+			</if>
+			<if test="ubirthday!=null">
+				ubirthday=#{ubirthday},
+			</if>
+			<if test="uaddress!=null">
+				uaddress=#{uaddress},
+			</if>
+			<if test="upic!=null">
+				upic=#{upic},
+			</if>
+			<if test="uphone!=null">
+				uphone=#{uphone},
+			</if>
+			<if test="uprofession!=null">
+				uprofession=#{uprofession},
+			</if>
+			<if test="upersondesc!=null">
+				upersondesc=#{upersondesc}
+			</if>
+		</set>
+		where usid=#{usid}
+	</update>
+	
+ 	<!-- 更改用户密码
+	<update id="updatePWD" parameterType="String" >
+		update b_user set upassword = #{upassword} where usid = #{usid}
+	</update> -->
+	<!-- 注册用户 -->
+	<insert id="insertUser" parameterType="B_user">
+		insert into
+		b_user(usid,uemail,upassword)
+		values(seq_usid.nextval,#{uemail},#{upassword})
+	</insert>
+</mapper>

@@ -1,0 +1,439 @@
+
+/* 共用css */
+* {
+	margin: 0;
+	padding: 0
+}
+
+body {
+	font: 12px/1.5 'Microsoft Yahei', 'Simsun';
+	color: #666666;
+	background: #fff
+}
+
+img {
+	border: 0;
+	display: block
+}
+
+ul {
+	list-style: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-size: 100%;
+	font-weight: normal;
+}
+
+a {
+	outline: none;
+}
+
+a:link, a:visited {
+	text-decoration: none;
+	color: #666
+}
+
+a:hover {
+	text-decoration: none;
+}
+
+.clear {
+	clear: both;
+}
+
+.blank {
+	height: 5px;
+	overflow: hidden;
+	width: 100%;
+	margin: auto;
+	clear: both
+}
+
+.f_l {
+	float: left
+}
+
+.f_r {
+	float: right
+}
+
+.l_box {
+	width: 670px;
+}
+
+.r_box {
+	width: 300px;
+}
+/* 头部信息 */
+header {
+	height: 80px;
+	text-align: center;
+	margin-top: 30px;
+	display: block;
+}
+
+header .centered {
+	width: 800px;
+	margin: 0px auto;
+	text-align: center;
+	display: block;
+}
+
+hr {
+	display: block;
+	height: 0;
+	border-top: 1px solid #eee;
+	-webkit-box-sizing: content-box;
+	box-sizing: content-box;
+	margin: 4px auto;
+}
+
+header .centered img {
+	margin: 0px auto;
+}
+
+nav {
+	line-height: 1.6;
+	height: 50px;
+	overflow: visible;
+	font-size: 18px;
+	color: #333;
+}
+
+nav .nav_left {
+	margin-left: 210px;
+	width:40%;
+	height:100%;
+	float:left;
+}
+/* 菜单栏右边 */
+#top_right{
+	margin-right: 190px;
+	width: 320px;
+	height: 100%;
+	float: right;
+}
+/* 用户显示信息 */
+#loginUname{
+	width: 110px;
+	font-size:16px;
+	border:none;
+	overflow: hidden;
+	text-align:left;
+	text-overflow: ellipsis;
+}
+
+nav .nav_left li {
+	height: 50px;
+	line-height: 50px;
+	float: left;
+	padding: 0px 18px;
+}
+
+nav .nav_left li a:hover {
+	color: #10D07A;
+	text-decoration: none;
+}
+nav .nav_right {
+	margin-right: 210px;
+	width: 100%;
+	height: 100%;
+} 
+
+nav .nav_right li {
+	height: 50px;
+	line-height: 50px;
+	float: right;
+	padding: 0px 4px;
+}
+
+nav .nav_right li a:hover {
+	color: #10D07A;
+	text-decoration: none;
+}
+
+
+nav .show_loginUser {
+	display:block;
+	width: 400px;
+	height: 100%;
+	float: left;
+	
+}
+
+nav .show_loginUser img {
+	height: 50px;
+	width:50px;
+	border-radius:50%;
+}
+nav .show_loginUser input{
+	border:none;
+	width:90px;
+}
+
+
+article {
+	width: 1000px;
+	margin: 20px auto;
+}
+
+#loadMore{
+	 height:40px;
+	 text-align: center;
+	 line-height:40px;
+	 background:#F0F3F5;
+}
+#loadMore:hover{
+	cursor:pointer;
+}
+
+.am-pagination {
+	padding-left: 0;
+	margin: 1.5rem 0;
+	list-style: none;
+	color: #000;
+	text-align: left
+}
+
+*+.am-article-divider, .am-article+.am-article {
+	margin-top: 2.4rem
+}
+
+.am-pagination:after, .am-pagination:before {
+	content: " ";
+	display: table
+}
+
+.am-pagination>li {
+	display: inline-block
+}
+
+.am-pagination>li>a, .am-pagination>li>span {
+	position: relative;
+	display: block;
+	padding: .5em 1em;
+	text-decoration: none;
+	line-height: 1.2;
+	background-color: #fff;
+	border: 1px solid #ddd;
+	border-radius: 0;
+	margin-bottom: 5px;
+	margin-right: 5px
+}
+
+.am-pagination .am-pagination-next a, .am-pagination .am-pagination-prev a
+	{
+	border-radius: 0
+}
+
+.am-pagination>li:last-child>a, .am-pagination>li:last-child>span {
+	margin-right: 0
+}
+
+.am-pagination>li>a:focus, .am-pagination>li>a:hover, .am-pagination>li>span:focus,
+	.am-pagination>li>span:hover {
+	background-color: #eee;
+}	
+
+ .am-pagination>li>a:hover{
+ 	color: #10D07A;
+ }
+
+
+
+/*footer*/
+footer {
+	background: #333;
+	width: 100%;
+	clear: both;
+	text-align: center;
+}
+
+.ft-copyright {
+	color: #fff;
+	line-height: 24px;
+}
+
+.ft-list {
+	background: url(../images/ft-wx-s.png) no-repeat right;
+	height: 100px
+}
+/*返回顶部*/
+* html {
+	background-image: url(about:blank);
+	background-attachment: fixed;
+} /*解决IE6下滚动抖动的问题*/
+#tbox {
+	width: 54px;
+	float: right;
+	position: fixed;
+	right: 50px;
+	bottom: 15px;
+	_position: absolute;
+	_bottom: auto;
+	_top: expression(eval(document.documentElement.scrollTop + 
+		 document.documentElement.clientHeight-this.offsetHeight- ( parseInt(this.currentStyle.marginTop
+		, 10)||0)-(parseInt(this.currentStyle.marginBottom, 10)||0)));
+	_margin-bottom: 15px;
+} /*解决IE6下不兼容 position:fixed 的问题*/
+#togbook, #gotop {
+	width: 54px;
+	height: 56px;
+	display: block;
+	background: url(../images/icons.png) no-repeat #111;
+	box-shadow: 0px 1px 0px rgba(255, 255, 255, .1), inset 0px 1px 1px
+		rgba(0, 0, 0, .7);
+	border-radius: 6px;
+}
+
+#togbook {
+	margin: 5px 0;
+	background-position: 10px -36px;
+}
+
+#gotop {
+	background-position: 12px 10px;
+}
+
+#togbook:hover, #gotop:hover {
+	opacity: 0.5
+}
+/*标签云*/
+.cloud {
+	width: 100%;
+	clear: both;
+	overflow: hidden
+}
+
+.cloud h3 {
+	line-height: 40px;
+	color: #38485A;
+	font-size: 18px;
+	border-bottom: 1px solid #E6E6E6;
+	height: 40px;
+}
+
+.cloud ul {
+	margin: 20px 0
+}
+
+.cloud ul li {
+	line-height: 24px;
+	height: 24px;
+	display: block;
+	background: #999;
+	float: left;
+	padding: 3px 11px;
+	margin: 10px 10px 0 0;
+	border-radius: 8px;
+	-moz-transition: all 0.5s;
+	-webkit-transition: all 0.5s;
+	-o-transition: all 0.5s;
+	transition: all 0.5s;
+}
+
+.cloud ul li a {
+	color: #FFF
+}
+
+.cloud ul li:nth-child(8n-7) {
+	background: #8A9B0F
+}
+
+.cloud ul li:nth-child(8n-6) {
+	background: #EB6841
+}
+
+.cloud ul li:nth-child(8n-5) {
+	background: #3FB8AF
+}
+
+.cloud ul li:nth-child(8n-4) {
+	background: #FE4365
+}
+
+.cloud ul li:nth-child(8n-3) {
+	background: #FC9D9A
+}
+
+.cloud ul li:nth-child(8n-2) {
+	background: #EDC951
+}
+
+.cloud ul li:nth-child(8n-1) {
+	background: #C8C8A9
+}
+
+.cloud ul li:nth-child(8n) {
+	background: #83AF9B
+}
+
+.cloud ul li:first-child {
+	background: #036564
+}
+
+.cloud ul li:last-child {
+	background: #3299BB
+}
+
+.cloud ul li:hover {
+	border-radius: 0;
+	text-shadow: #000 1px 1px 1px
+}
+/* 切换卡 */
+.moreSelect {
+	width: 100%;
+	margin: 30px 0 20px 0;
+	overflow: hidden
+}
+
+.ms-top {
+	height: 32px;
+	border-bottom: solid 1px #EAEAEA;
+	font-size: 14px
+}
+
+#tab li a {
+	float: left;
+	height: 32px;
+	cursor: pointer;
+	line-height: 32px;
+	list-style-type: none;
+	padding: 0 15px;
+}
+
+#tab li.cur a {
+	color: #fff;
+	background: #f77825;
+}
+
+.bd {
+	display: none
+}
+
+.bd-news ul {
+	padding: 10px 0 0 10px;
+	background: url(../images/ph2.png) no-repeat 10px 29px;
+}
+
+.bd-news ul li {
+	border-bottom: solid 1px #EAEAEA;
+	line-height: 30px;
+	height: 30px;
+	overflow: hidden;
+	font-size: 14px;
+	padding: 10px 0 0 30px;
+}
+
+.bd-news ul li a {
+	display: block;
+}
+
+.bd-news ul li a:hover {
+	color: #000;
+}
+
+.bd-news ul li:hover {
+	border-bottom: #000 1px solid;
+} /* 鼠标放上去的效果 */

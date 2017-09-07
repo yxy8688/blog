@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 映射文件的命名空间namespace的值是与之对应的映射接口的全类名 -->
+<mapper namespace="com.yc.ssm.us.mapper.B_typeMapper">
+	<resultMap type="PaginationBean" id="PaginationBeanMap">
+		<collection property="rows"
+			column="{pageSize=pageSize,currPage=currPage}" ofType="B_type"
+			select="getPartType" />
+	</resultMap>
+	<select id="partType" parameterType="PaginationBean" resultMap="PaginationBeanMap">
+		select count(1) total ,ceil(count(1)/${pageSize}) totalPage ,
+		${currPage}currPage,${pageSize} pageSize from b_type
+	</select>
+
+	<select id="getPartType" resultType="B_type">
+		select * from (select
+		n.*,rownum rn from
+		(select b.*,nvl(w.articlenum,0) articlenum from B_TYPE b 
+		left join (select tid,count(1) articlenum from b_article group by tid) w on b.tid = w.tid
+		order by 1 )n where
+		${currPage}*${pageSize}>=rownum) t
+		where rn>(${currPage}-1)*${pageSize}
+	</select>
+	<select id="findTypeAll" resultType="B_type">
+		select * from b_type
+	</select>
+	<insert id="insertType">
+		insert into b_type values(seq_tid.nextval,#{tname})
+	</insert>
+
+	<update id="modifyType" parameterType="B_type">
+		update b_type
+		<set>
+			<if test="tname!=null">
+				tname=#{tname}
+			</if>
+		</set>
+		where tid=#{tid}
+	</update>
+
+	<delete id="deleteType">
+		delete from b_type where tid=#{tid}
+	</delete>
+	
+	<!-- 查询所有的类型 -->
+	<select id="findAll" resultType="B_type" >
+		select * from b_type
+	</select>
+</mapper>

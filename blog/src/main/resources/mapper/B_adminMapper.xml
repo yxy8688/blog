@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 映射文件的命名空间namespace的值是与之对应的映射接口的全类名 -->
+<mapper namespace="com.yc.ssm.us.mapper.B_adminMapper">
+	<select id="finUser" parameterType="B_admin" resultType="B_admin">
+		select *
+		from b_admin where adname=#{adname} and adpassword=#{adpassword}
+	</select>
+	<select id="forgetPassword" parameterType="B_admin" resultType="B_admin">
+		select *
+		from b_admin where adname=#{adname} and admail=#{admail}
+	</select>
+
+	<resultMap type="PaginationBean" id="PaginationBeanMap">
+		<collection property="rows"
+			column="{pageSize=pageSize,currPage=currPage}" ofType="B_user"
+			select="getPartUser" />
+	</resultMap>
+	<select id="partUser" parameterType="PaginationBean" resultMap="PaginationBeanMap">
+		select count(1) total ,ceil(count(1)/${pageSize}) totalPage ,
+		${currPage}currPage,${pageSize} pageSize from b_admin
+	</select>
+
+	<select id="getPartUser" resultType="B_admin">
+		select * from (select
+		n.*,rownum rn from
+		(select * from b_admin order by 1)n where
+		${currPage}*${pageSize}>=rownum) t
+		where
+		rn>(${currPage}-1)*${pageSize}
+	</select>
+
+	<insert id="insertUser" parameterType="B_admin">
+		insert into
+		b_admin
+		values(seq_adid.nextval,#{adname},#{adpassword},#{admail})
+	</insert>
+
+
+
+	<update id="modifyUser" parameterType="B_admin">
+		update b_admin
+		<set>
+			<if test="adname!=null">
+				adname=#{adname},
+			</if>
+			<if test="adpassword!=null">
+				adpassword=#{adpassword},
+			</if>
+			<if test="admail!=null">
+				admail=#{admail}
+			</if>
+		</set>
+		where adid=#{adid}
+	</update>
+	<delete id="deleteUser">
+		delete from b_admin where adid=#{adid}
+	</delete>
+
+</mapper>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 映射文件的命名空间namespace的值是与之对应的映射接口的全类名 -->
+<mapper namespace="com.yc.ssm.us.mapper.B_columnMapper">
+	<!-- 分页查询板块 -->
+	<resultMap type="PaginationBean" id="PaginationBeanMap">
+		<collection property="rows"
+			column="{pageSize=pageSize,currPage=currPage}" ofType="B_column"
+			select="getPartColumn" />
+	</resultMap>
+	<select id="partColumn" parameterType="PaginationBean"
+		resultMap="PaginationBeanMap">
+		select count(1) total ,ceil(count(1)/${pageSize})
+		totalPage ,
+		${currPage} currPage,${pageSize} pageSize from b_column
+	</select>
+	<select id="getPartColumn" resultType="B_column">
+		select * from (
+		select
+		n.*,rownum rn from (
+		select bc.*,bu.uname,bu.uemail from
+		b_column bc, b_user bu
+		where bc.usid = bu.usid(+) order by 1)n
+		where ${currPage}*${pageSize}>=rownum) t
+		where rn>(${currPage}-1)*${pageSize}
+	</select>
+
+	<!-- 查询所有板块 -->
+	<select id="findColumnAll" resultType="B_column">
+		select bc.*,bu.uname,bu.uemail from
+		b_column bc, b_user bu
+		where bc.usid = bu.usid(+)
+	</select>
+	
+	
+	<!--通过板块名查询 -->
+	<select id="findCoaidByCotitle" parameterType="String"
+		resultType="String">
+		select bc.coaid from b_column bc where bc.cotitle=#{cotitle}
+	</select>
+	<!--通过板块名查询 -->
+	<select id="findCoaidByCoid" parameterType="String"
+		resultType="String">
+		select bc.coaid from b_column bc where bc.coid=#{coid}
+	</select>
+	<!-- 新建板块 -->
+	<insert id="addColumn" parameterType="B_column">
+		insert into b_column
+		(coid,cotitle,coaid,cotime,usid,cocontent,copic,articlenum)
+		values(seq_coid.nextval,#{cotitle},#{coaid},to_char(sysdate,'yyyy-MM-dd
+		hh:mi:ss'),(select bu.usid from b_user bu where
+		bu.uemail=#{uemail}),#{cocontent},#{copic},#{articlenum})
+	</insert>
+	
+	<!--  新建个人模板-->
+	<insert id="addColumnByUsid" parameterType="B_column">
+		insert into b_column(coid,cotitle,cocontent,usid,cotime,copic)
+			values(seq_coid.nextval,#{cotitle},#{cocontent},#{usid},
+			to_char(sysdate,'yyyy-MM-dd hh24:mi:ss'),#{copic})
+	</insert>
+	<!-- 查询个人板块 -->
+	<select id="findColumnByUsid" parameterType="B_column" resultType="B_column">
+		select * from b_column where usid = #{usid}
+	</select>
+	<!-- 查询指定板块 -->
+		<select id="findColumnByCoid" parameterType="Integer" resultType="B_column">
+		select b.*,bu.uname from b_column b inner join b_user bu on b.usid = bu.usid where coid = #{coid}
+	</select>
+	
+	<!-- 添加个人板块的文章 -->
+	<update id="addArticleByCoid" parameterType="B_column">
+		update b_column set coaid = #{coaid},articlenum =#{articlenum} where coid = #{coid}
+	</update>
+	<!-- 更改板块的浏览量 -->
+	<update id="updateAviewNum" parameterType="B_column">
+		update b_column set coviewnum = (coviewnum+1) where coid = #{coid}
+	</update>
+	
+	<!--删除个人板块 -->
+	<delete id="deleteColumnByCoid">
+		delete from b_column where coid = #{coid}
+	</delete> 
+	<!-- 删除板块 -->
+	<delete id="deleteColumn">
+		delete from b_column where coid=#{coid}
+	</delete>
+	
+	<!-- 修改板块 -->
+	<update id="updateColumn" parameterType="B_column">
+		update B_column
+		<set>
+			<if test="cotitle!=null"> cotitle=#{cotitle}, </if>
+			<if test="cocontent!=null"> cocontent=#{cocontent}, </if>
+			<if test="copic!=null"> copic=#{copic}, </if>
+			cotime = to_char(sysdate,'yyyy-MM-dd hh24:mi:ss')
+		</set>
+		where coid=#{coid}
+	</update>
+</mapper>

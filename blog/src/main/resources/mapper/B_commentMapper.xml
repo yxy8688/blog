@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 映射文件的命名空间namespace的值是与之对应的映射接口的全类名 -->
+<mapper namespace="com.yc.ssm.us.mapper.B_commentMapper">
+
+	<!-- 查询指定文章的评论数(返回评论总数和评论的页码) -->
+	<select id="selectCommentNum" resultType="B_comment"
+		parameterType="B_comment">
+		select count(1) total ,ceil(count(1)/5) totalPage from
+		b_comment where caid = #{caid}
+	</select>
+	<!-- 查询指定用户所发的评论数(返回评论总数和评论的页码) -->
+	<select id="findCommentNumByUsid" resultType="B_comment"
+		parameterType="B_comment">
+		select count(1) total ,ceil(count(1)/${pageSize}) totalPage from
+		b_comment where usid = #{usid}
+	</select>
+	
+	<!-- 查询用户文章的总评论数及页码 -->
+	<select id="findCommentNum" parameterType="B_comment" resultType="B_comment">
+		select count(1) total ,ceil(count(1)/${pageSize}) totalPage from 
+		(select * from B_COMMENT b inner join (select aid from B_ARTICLE where usid = #{usid}) t on b.caid = t.aid)
+	</select>
+	
+	<!-- 通过文章id 查询所有的评论（分页） -->
+	<select id="findCommentByCaid" resultType="B_comment"
+		parameterType="B_comment">
+		select * from (
+		select t.*, rownum rn from (
+		select
+		b.*,bu.uname,bu.upic from b_comment b
+		inner join b_user bu on bu.usid =
+		b.usid order by b.ctime) t
+		where ${currPage}*${pageSize}>=rownum and
+		t.caid = #{caid} )
+		where rn>(${currPage}-1)*${pageSize}
+	</select>
+	<!-- 通过用户usid 查询所有的评论（分页） -->
+	<select id="findCommentByUsid" resultType="B_comment"
+		parameterType="B_comment">
+		select * from (
+		select t.*, rownum rn from (
+		select
+		b.*,bu.uname,ba.aid,ba.atitle from b_comment b
+		inner join b_user bu on bu.usid =b.usid
+		inner join b_article ba on b.caid = ba.aid ) t
+		where ${currPage}*${pageSize}>=rownum and
+		t.usid = #{usid})
+		where rn>(${currPage}-1)*${pageSize}
+	</select>
+	
+	<!--  查询用户所发文章的所有评论内容（分页）-->
+	<select id="findComment" parameterType="B_comment" resultType="B_comment">
+	select * from (
+		select w.*, rownum rn from (
+			select b.*,t.*,bu.uname from b_comment b 
+			inner join (select aid,atitle from B_ARTICLE where usid = #{usid}) t on b.caid = t.aid
+			inner join B_USER bu on b.usid = bu.usid) w
+			where  ${currPage}*${pageSize}>=rownum )
+			where rn >(${currPage}-1)*${pageSize}
+	</select>
+	
+	<!--  -->
+	<resultMap type="PaginationBean" id="PaginationBeanMap">
+		<collection property="rows"
+			column="{pageSize=pageSize,currPage=currPage}" ofType="B_comment"
+			select="getPartComment" />
+	</resultMap>
+	<select id="partComment" parameterType="PaginationBean"
+		resultMap="PaginationBeanMap">
+		select count(1) total ,ceil(count(1)/${pageSize})
+		totalPage ,
+		${currPage} currPage,${pageSize} pageSize from b_comment
+	</select>
+	<select id="getPartComment" resultType="B_comment"> 
+	select * from (
+		select n.*,rownum rn from 
+		(select bc.*,nvl(bu.uname,'无名氏') uname,bu.uemail,ba.atitle,bu.upic from
+			b_comment bc,b_user bu,b_article ba 
+		where ba.aid(+)=bc.caid and bu.usid(+)=bc.usid order by bc.usid)n 
+		where ${currPage}*${pageSize}>=rownum) t
+		where rn>(${currPage}-1)*${pageSize}
+	</select>
+
+	<!-- 添加评论 -->
+	<insert id="insertComment" parameterType="B_comment">
+		insert into b_comment
+		values(seq_cid.nextval,#{caid},#{usid},#{ccontent},to_char(sysdate,'yyyy-MM-dd hh:mi:ss'))
+	</insert>
+
+	<!-- 删除评论 -->
+	<delete id="deleteComment">
+		delete from b_comment where cid=#{cid}
+	</delete>
+</mapper>

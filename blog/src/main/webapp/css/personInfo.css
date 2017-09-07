@@ -1,0 +1,43 @@
+@CHARSET "UTF-8";
+
+#contentBox{
+	width:100%;
+	margin-top:2%;
+	font-size:16px;
+}
+#contentBox ul li{
+	width:100%;
+	list-style-type:none;
+	margin-bottom: 20px;
+}
+#contentBox ul li label{
+	font: 18px/1.5 'Microsoft Yahei', 'Simsun';
+	margin-right:15px;
+}
+#upicPath{
+	margin-top:10px;
+	margin-left:9%;
+}
+#camera{
+	margin-top:10px;
+	margin-left:9%;
+}
+#contentBox ul li .rad2{
+	margin-left:20px;
+}
+.button_reset{
+	width:70px;
+	margin-left:140px;
+}
+.button_submit{
+		width:70px;
+	margin-left:60px;
+}
+#tag_userinfo ul li {
+	padding-top:20px;
+	line-height:30px;
+	list-style-type:none;
+	font: 16px/1.5 'Microsoft Yahei', 'Simsun';
+}
+
+
